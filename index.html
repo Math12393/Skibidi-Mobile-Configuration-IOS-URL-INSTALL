@@ -1,79 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- 🏷️ CHANGE THIS: Browser tab title -->
-  <title>Skibidi (Mobile Configuration) (IOS) URL INSTALL</title>
-  
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .container {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      width: 90%;
-      max-width: 600px;
-      text-align: center;
-    }
-    textarea {
-      width: 100%;
-      height: 150px;
-      font-size: 16px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      resize: none;
-    }
-    button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      border: none;
-      background-color: #007bff;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skibidi (Mobile Configuration) (IOS) URL INSTALL</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+  }
+  .container {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    width: 90%;
+    max-width: 600px;
+    text-align: center;
+  }
+  textarea {
+    width: 100%;
+    height: 150px;
+    font-size: 16px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    resize: none;
+  }
+  button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    min-width: 160px; /* ensures "Text copied!" fits */
+    transition: background 0.3s;
+  }
+  button:hover {
+    background-color: #0056b3;
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <!-- 🏷️ CHANGE THIS: Main page heading -->
-    <h2>Skibidi (Mobile Configuration) (IOS) URL INSTALL</h2>
+<div class="container">
+  <h2>Skibidi (Mobile Configuration) (IOS) URL INSTALL</h2>
+  <textarea id="sharedText" readonly></textarea><br>
+  <button id="copyBtn">Copy Text</button>
+</div>
 
-    <textarea id="sharedText" readonly></textarea><br>
-    <button onclick="copyText()">Copy Text</button>
-  </div>
+<script>
+  // Get text from URL ?text=... or default
+  let text = new URLSearchParams(window.location.search).get("text") ||
+    "https://skibiditech.co/mobileconfig.php";
 
-  <script>
-    // Get text from URL (?text=Your%20message)
-    const params = new URLSearchParams(window.location.search);
+  // Remove trailing spaces and periods
+  text = text.trim().replace(/\.+$/,"");
 
-    // 🏷️ CHANGE THIS: Default text when no ?text= is used
-    const text = params.get("text") || "https://skibiditech.co/mobileconfig.php";
+  const textarea = document.getElementById("sharedText");
+  const copyBtn = document.getElementById("copyBtn");
+  textarea.value = text;
 
-    document.getElementById("sharedText").value = text;
-
-    // Copy button
-    function copyText() {
-      const textarea = document.getElementById("sharedText");
-      textarea.select();
-      document.execCommand("copy");
-      alert("Text copied!");
+  copyBtn.addEventListener("click", () => {
+    // Function to show confirmation on button
+    function showCopied() {
+      const originalText = copyBtn.textContent;
+      copyBtn.textContent = "Text copied!";
+      copyBtn.style.backgroundColor = "#28a745"; // green flash
+      setTimeout(() => {
+        copyBtn.textContent = originalText;
+        copyBtn.style.backgroundColor = "#007bff";
+      }, 2000);
     }
-  </script>
+
+    // Fallback for older browsers
+    function fallbackCopy() {
+      textarea.select();
+      textarea.setSelectionRange(0, 99999); // mobile
+      try {
+        document.execCommand("copy");
+        showCopied();
+      } catch {
+        alert("Copy failed. Please copy manually.");
+      }
+    }
+
+    // Try modern clipboard API first
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(textarea.value)
+        .then(showCopied)
+        .catch(fallbackCopy);
+    } else {
+      fallbackCopy();
+    }
+  });
+</script>
 </body>
 </html>
